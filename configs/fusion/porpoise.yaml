@@ -1,0 +1,116 @@
+# Dataset parameters
+data_dir: ./input/feature/phikon/TCGA_FEATURE/TCGA_LUAD  # path to dataset (root dir)
+csv_path: ./input/survival/rnasig/tcga_luad_all_clean.csv.zip  # path to omics csv file
+split_dir: ./splits/5foldcv/tcga_luad  # path to cross validation split files
+k: 0  # fold number
+feature_shuffle: true  # enable features shuffle
+num_bins: 4  # number of bins for survival data
+omics_data_type:  # omics data type
+  - cnv
+  - rnaseq
+val: true  # enable validation
+
+# Model parameters
+model: porpoise_mmf  # Name of model to train (default: "resnet50")
+initial_checkpoint: ""  # Load this checkpoint into model after initialization (default: none)
+resume: ""  # Resume full model and optimizer state from checkpoint (default: none)
+no_resume_opt: false  # prevent resume of optimizer state when resuming model
+num_classes: 4  # number of label classes (Model default if None)
+in_chans: null  # Image input channels (default: None => 3)
+batch_size: 1  # Input batch size for training (default: 128)
+validation_batch_size: null  # Validation batch size override (default: None)
+fuser: ""  # Select jit fuser. One of ('', 'te', 'old', 'nvfuser')
+grad_accum_steps: 32  # The number of steps to accumulate gradients (default: 1)
+grad_checkpointing: false  # Enable gradient checkpointing through model blocks/stages
+fast_norm: false  # enable experimental fast-norm
+model_kwargs:  # additional model arguments
+  omic_input_dim: 3096
+  path_input_dim: 768
+  dropinput: 0.1
+  size_arg: "vit_s_small"
+  fusion: "bilinear"
+head_init_scale: null  # Head initialization scale
+head_init_bias: null  # Head initialization bias value
+torchscript: false  # torch.jit.script the full model
+torchcompile: null  # Enable compilation w/ specified backend (default: inductor).
+
+# Device & distributed
+device: cuda  # Device (accelerator) to use.
+amp: null  # use NVIDIA Apex AMP or Native AMP for mixed precision training
+amp_dtype: float16  # lower precision AMP dtype (default: float16)
+amp_impl: native  # AMP impl to use, "native" or "apex" (default: native)
+no_ddp_bb: false  # Force broadcast buffers for native DDP to off.
+synchronize_step: false  # torch.cuda.synchronize() end of each step
+local_rank: 0
+device_modules: null  # Python imports for device backend modules.
+
+# Optimizer parameters
+opt: adam  # Optimizer (default: "sgd")
+opt_eps: null  # Optimizer Epsilon (default: None, use opt default)
+opt_betas: null  # Optimizer Betas (default: None, use opt default)
+momentum: 0.9  # Optimizer momentum (default: 0.9)
+weight_decay: 1e-5  # weight decay (default: 2e-5)
+clip_grad: null  # Clip gradient norm (default: None, no clipping)
+clip_mode: norm  # Gradient clipping mode. One of ("norm", "value", "agc")
+layer_decay: null  # layer-wise learning rate decay (default: None)
+opt_kwargs: {}  # additional optimizer arguments
+
+# Learning rate schedule parameters
+use_sched: false  # scheduler on/off
+sched: cosine  # LR scheduler (default: "cosine")
+sched_on_updates: false  # Apply LR scheduler step on update instead of epoch end.
+lr: 2e-4  # learning rate, overrides lr-base if set (default: None)
+lr_base: 0.1  # base learning rate: lr = lr_base * global_batch_size / base_size
+lr_base_size: 256  # base learning rate batch size (divisor, default: 256)
+lr_base_scale: ""  # base learning rate vs batch_size scaling ("linear", "sqrt", based on opt if empty)
+lr_noise: null  # learning rate noise on/off epoch percentages
+lr_noise_pct: 0.67  # learning rate noise limit percent (default: 0.67)
+lr_noise_std: 1.0  # learning rate noise std-dev (default: 1.0)
+lr_cycle_mul: 1.0  # learning rate cycle len multiplier (default: 1.0)
+lr_cycle_decay: 0.5  # amount to decay each learning rate cycle (default: 0.5)
+lr_cycle_limit: 1  # learning rate cycle limit, cycles enabled if > 1
+lr_k_decay: 1.0  # learning rate k-decay for cosine/poly (default: 1.0)
+warmup_lr: 1e-5  # warmup learning rate (default: 1e-5)
+min_lr: 0  # lower lr bound for cyclic schedulers that hit 0 (default: 0)
+epochs: 100  # number of epochs to train (default: 300)
+epoch_repeats: 0.0  # epoch repeat multiplier (number of times to repeat dataset epoch per train epoch)
+start_epoch: null  # manual epoch number (useful on restarts)
+decay_milestones:  # list of decay epoch indices for multistep lr. must be increasing
+  - 90
+  - 180
+  - 270
+decay_epochs: 90  # epoch interval to decay LR
+warmup_epochs: 5  # epochs to warmup LR, if scheduler supports
+warmup_prefix: false  # Exclude warmup period from decay schedule.
+cooldown_epochs: 0  # epochs to cooldown LR at min_lr, after cyclic schedule ends
+patience_epochs: 10  # patience epochs for Plateau LR scheduler (default: 10)
+decay_rate: 0.1  # LR decay rate (default: 0.1)
+
+# Augmentation & regularization parameters
+loss: nll_surv  # Loss function (default: nll_surv)
+loss_alpha: 0.0  # how much to weigh uncensored patients
+
+# Batch norm parameters (only works with gen_efficientnet based models currently)
+sync_bn: false  # Enable NVIDIA Apex or Torch synchronized BatchNorm.
+dist_bn: reduce  # Distribute BatchNorm stats between nodes after each epoch ("broadcast", "reduce", or "")
+
+# Model exponential moving average parameters
+model_ema: false  # Enable tracking moving average of model weights.
+model_ema_force_cpu: false  # Force ema to be tracked on CPU, rank=0 node only. Disables EMA validation.
+model_ema_decay: 0.9998  # Decay factor for model weights moving average (default: 0.9998)
+model_ema_warmup: false  # Enable warmup for model EMA decay.
+
+# Miscellaneous parameters
+seed: 42  # random seed (default: 42)
+worker_seeding: all  # worker seed mode (default: all)
+log_interval: 5  # how many batches to wait before logging training status
+recovery_interval: 0  # how many batches to wait before writing recovery checkpoint
+checkpoint_hist: 5  # number of checkpoints to keep (default: 10)
+workers: 4  # how many training processes to use (default: 4)
+pin_mem: true  # Pin CPU memory in DataLoader for more efficient (sometimes) transfer to GPU.
+weighted_sampler: false  # Use weighted sampling for class imbalance in classification
+output: ./output/fusion/tcga_luad  # path to output folder (default: none, current dir)
+experiment: ""  # name of train experiment, name of sub-folder for output
+eval_metric: c-index  # Best metric (default: "c-index")
+log_wandb: true  # log training and validation metrics to wandb
+wandb_project: "framework_testout"  # Wandb project name (default: None)
