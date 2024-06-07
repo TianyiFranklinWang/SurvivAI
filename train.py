@@ -1,4 +1,4 @@
-""" Fusion Training Script
+""" Survival Analysis Training Script
 Copyright (c) 2024, Tianyi Wang @ The University of Sydney
 All rights reserved.
 
