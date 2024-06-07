@@ -32,7 +32,7 @@ from torch.utils.data import DataLoader
 
 import models
 from datasets import TCGAMilGenomeSurvivalDataset
-from engines.engine_fusion import train_one_epoch, validate
+from engines.engine_survival import train_one_epoch, validate
 from loss import CrossEntropySurvLoss, NLLSurvLoss
 from utils import visual_omics_collate_fn, class_balanced_sampler
 
