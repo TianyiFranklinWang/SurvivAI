@@ -1,2 +1,2 @@
 # SurvivAI
-Multi-modal Alignment and Fusion for Survival Prediction
+Multi-modal Survival Analysis Using Histopathology and Genetic Data
