@@ -169,9 +169,9 @@ def validate(
 ):
     batch_time_m = utils.AverageMeter()
     losses_m = utils.AverageMeter()
-    all_risk_scores = list()
-    all_censorships = list()
-    all_event_times = list()
+    all_risk_scores = []
+    all_censorships = []
+    all_event_times = []
 
     model.eval()
 
